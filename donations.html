@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пожертвования — Добромобиль</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h2>🐾 Добромобиль</h2>
+    <nav>
+        <a href="index.html">Главная</a>
+        <a href="about.html">О проекте</a>
+        <a href="guide.html">Как помочь</a>
+        <a href="map.html">Приюты</a>
+        <a href="shelter_register.html">Регистрация</a>
+        <a href="shelter_rules.html">Правила</a>
+        <a href="donations.html">Пожертвования</a>
+        <a href="faq.html">Вопросы</a>
+        <a href="reviews.html">Отзывы</a>
+        <a href="reports.html">Отчёты</a>
+        <a href="contacts.html">Контакты</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <h1>Помоги животным!</h1>
+    <p>Каждый вклад помогает приютам получать необходимую поддержку.</p>
+</section>
+
+<section>
+    <h2>На что пойдут пожертвования?</h2>
+
+    <div class="card">
+        <h3>🐾 Корма</h3>
+        <p>Покупка питания для животных в приютах.</p>
+    </div>
+
+    <div class="card">
+        <h3>💊 Медикаменты</h3>
+        <p>Приобретение необходимых лекарств и ветеринарных средств.</p>
+    </div>
+
+    <div class="card">
+        <h3>🚐 Транспорт</h3>
+        <p>Организация поездок и доставка помощи в приюты.</p>
+    </div>
+
+    <div class="card">
+        <h3>🧤 Инвентарь</h3>
+        <p>Покупка перчаток, переносок, уборочного инвентаря и других необходимых вещей.</p>
+    </div>
+</section>
+
+<section>
+    <h2>Выбери сумму помощи</h2>
+
+    <div class="card">
+        <h3>100 ₽</h3>
+        <p>Небольшой, но важный вклад.</p>
+    </div>
+
+    <div class="card">
+        <h3>300 ₽</h3>
+        <p>Поддержка покупки необходимых вещей.</p>
+    </div>
+
+    <div class="card">
+        <h3>500 ₽</h3>
+        <p>Помощь ежедневным нуждам приюта.</p>
+    </div>
+
+    <div class="card">
+        <h3>1000 ₽</h3>
+        <p>Более весомая поддержка животных.</p>
+    </div>
+</section>
+
+<section>
+    <h2>Оформить пожертвование</h2>
+
+    <div class="card">
+        <form onsubmit="event.preventDefault(); alert('Это демонстрационная форма. Онлайн-оплата пока не подключена.');">
+
+            <label for="direction">Направление помощи</label>
+            <select id="direction" required>
+                <option value="">Выберите направление</option>
+                <option value="food">Корма</option>
+                <option value="medicine">Медикаменты</option>
+                <option value="transport">Транспорт</option>
+                <option value="equipment">Инвентарь</option>
+            </select>
+
+            <br><br>
+
+            <label for="amount">Сумма пожертвования (₽)</label>
+            <input id="amount" type="number" min="1"
+                   placeholder="Например, 700" required>
+
+            <br><br>
+
+            <label for="email">Электронная почта</label>
+            <input id="email" type="email"
+                   placeholder="example@mail.com" required>
+
+            <br><br>
+
+            <p><strong>Периодичность пожертвования:</strong></p>
+
+            <label>
+                <input type="radio" name="period" value="once" checked>
+                Разовое пожертвование
+            </label>
+
+            <br>
+
+            <label>
+                <input type="radio" name="period" value="monthly">
+                Ежемесячное пожертвование
+            </label>
+
+            <br><br>
+
+            <p><strong>Предполагаемый способ оплаты:</strong></p>
+
+            <label>
+                <input type="radio" name="payment" value="card" required>
+                Банковская карта
+            </label>
+
+            <br>
+
+            <label>
+                <input type="radio" name="payment" value="sbp">
+                Система быстрых платежей (СБП)
+            </label>
+
+            <br><br>
+
+            <button type="submit" class="button">
+                Продолжить
+            </button>
+
+        </form>
+    </div>
+
+    <p>⚠️ Форма демонстрационная. Реальная оплата картой и через СБП пока не подключена.</p>
+</section>
+
+<section>
+    <h2>Прозрачность и отчётность</h2>
+
+    <div class="card">
+        <h3>До 10% на административные расходы</h3>
+        <p>На административные расходы направляется не более 10% пожертвований.</p>
+    </div>
+
+    <div class="card">
+        <h3>Публикация отчётов</h3>
+        <p>Мы показываем информацию о собранных средствах и их использовании.</p>
+        <a href="reports.html" class="button">Посмотреть отчёты</a>
+    </div>
+</section>
+
+<section>
+    <h2>Реквизиты для пожертвований</h2>
+    <div class="card">
+        <p>Банковские реквизиты проекта будут опубликованы после их подтверждения.</p>
+        <p>Для уточнения информации: info@dobromobil.ru</p>
+    </div>
+</section>
+
+<section>
+    <h2>Спасибо за вашу помощь! ❤️</h2>
+    <p>Даже небольшой вклад может сделать жизнь животных лучше.</p>
+    <a href="index.html" class="button">На главную</a>
+</section>
+
+<footer>
+    <p>© 2026 Добромобиль. Вместе помогаем животным!</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты — Добромобиль</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h2>🐾 Добромобиль</h2>
+    <nav>
+        <a href="index.html">Главная</a>
+        <a href="about.html">О проекте</a>
+        <a href="guide.html">Как помочь</a>
+        <a href="map.html">Карта приютов</a>
+        <a href="shelter_register.html">Регистрация</a>
+        <a href="shelter_rules.html">Правила</a>
+        <a href="donations.html">Пожертвования</a>
+        <a href="faq.html">Вопросы</a>
+        <a href="reviews.html">Отзывы</a>
+        <a href="reports.html">Отчёты</a>
+        <a href="contacts.html">Контакты</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <h1>Свяжитесь с нами</h1>
+    <p>Есть вопрос, идея или предложение? Мы всегда рады общению!</p>
+</section>
+
+<section>
+    <h2>Наши контакты</h2>
+
+    <div class="card">
+        <h3>📧 Электронная почта</h3>
+        <p><a href="mailto:info@dobromobil.ru">info@dobromobil.ru</a></p>
+    </div>
+
+    <div class="card">
+        <h3>📱 Телефон</h3>
+        <p><a href="tel:+79114756242">+7 (911) 475-62-42</a></p>
+    </div>
+
+    <div class="card">
+        <h3>📍 Адрес</h3>
+        <p>Сургут, Югорский тракт, 38</p>
+    </div>
+
+    <div class="card">
+        <h3>🤝 Социальные сети</h3>
+        <p>Мы также доступны в социальных сетях:</p>
+        <p>Telegram и VK</p>
+        <p>Ссылки на официальные страницы будут добавлены после их подтверждения.</p>
+    </div>
+</section>
+
+<section>
+    <h2>Напишите нам</h2>
+    <p>Заполните форму, и мы постараемся ответить в течение 2 рабочих дней.</p>
+
+    <form onsubmit="event.preventDefault(); alert('Спасибо за обращение! Это демонстрационная форма. Отправка сообщений пока не подключена.');">
+
+        <div class="card">
+
+            <label for="name">Ваше имя</label>
+            <input id="name" type="text"
+                   placeholder="Введите имя" required>
+
+            <br><br>
+
+            <label for="email">Электронная почта</label>
+            <input id="email" type="email"
+                   placeholder="Введите email" required>
+
+            <br><br>
+
+            <label for="subject">Тема обращения</label>
+            <select id="subject" required>
+                <option value="">Выберите тему</option>
+                <option value="volunteer">Волонтёрство</option>
+                <option value="shelter">Помощь приюту</option>
+                <option value="donation">Пожертвования</option>
+                <option value="cooperation">Сотрудничество</option>
+                <option value="other">Другой вопрос</option>
+            </select>
+
+            <br><br>
+
+            <label for="message">Ваше сообщение</label>
+            <textarea id="message" rows="5"
+                      placeholder="Напишите сообщение..."
+                      required></textarea>
+
+            <br><br>
+
+            <button type="submit" class="button">
+                Отправить сообщение
+            </button>
+
+        </div>
+    </form>
+</section>
+
+<footer>
+    <p>© 2026 Добромобиль. Вместе помогаем животным!</p>
+    <p>Волонтёрский проект помощи приютам для животных.</p>
+    <p>info@dobromobil.ru</p>
+</footer>
+
+</body>
+</html>

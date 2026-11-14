@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация приюта — Добромобиль</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h2>🐾 Добромобиль</h2>
+    <nav>
+        <a href="index.html">Главная</a>
+        <a href="about.html">О проекте</a>
+        <a href="guide.html">Как помочь</a>
+        <a href="map.html">Карта помощи</a>
+        <a href="shelter_register.html">Регистрация</a>
+        <a href="shelter_rules.html">Правила</a>
+        <a href="donations.html">Пожертвования</a>
+        <a href="faq.html">Вопросы</a>
+        <a href="reviews.html">Отзывы</a>
+        <a href="reports.html">Отчёты</a>
+        <a href="contacts.html">Контакты</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <h1>Зарегистрировать приют</h1>
+    <p>
+        Если вы представляете приют для животных и вам нужна помощь —
+        заполните заявку. Мы проверим данные и добавим приют на карту.
+    </p>
+</section>
+
+<section>
+    <h2>Заявка на регистрацию</h2>
+
+    <form onsubmit="event.preventDefault(); alert('Спасибо! Ваша заявка подготовлена. Это демонстрационная форма: отправка координатору пока не подключена.');">
+        <div class="card">
+
+            <label for="shelter">Название приюта</label>
+            <input id="shelter" type="text" required>
+
+            <label for="direction">Направление</label>
+            <select id="direction" required>
+                <option value="">Выберите направление</option>
+                <option>Помощь приютам животных</option>
+            </select>
+
+            <label for="address">Фактический адрес приюта</label>
+            <input id="address" type="text" placeholder="Город, улица, дом" required>
+
+            <label for="latitude">Широта</label>
+            <input id="latitude" type="text" placeholder="Например, 55.7558">
+
+            <label for="longitude">Долгота</label>
+            <input id="longitude" type="text" placeholder="Например, 37.6173">
+
+            <label for="person">Контактное лицо</label>
+            <input id="person" type="text" required>
+
+            <label for="position">Должность</label>
+            <input id="position" type="text">
+
+            <label for="phone">Телефон</label>
+            <input id="phone" type="tel" required>
+
+            <label for="email">Электронная почта</label>
+            <input id="email" type="email" required>
+
+            <h3>Юридические данные (при наличии)</h3>
+
+            <label for="inn">ИНН</label>
+            <input id="inn" type="text">
+
+            <label for="ogrn">ОГРН</label>
+            <input id="ogrn" type="text">
+
+            <label for="status">Статус НКО</label>
+            <input id="status" type="text" placeholder="Укажите статус или напишите, что юрлица нет">
+
+            <label for="description">Описание приюта</label>
+            <textarea id="description" rows="5" placeholder="Сколько животных, чем занимаетесь, как давно работаете..." required></textarea>
+
+            <label for="needs">Актуальные потребности</label>
+            <textarea id="needs" rows="5" placeholder="Корма, медикаменты, тёплые вещи, инвентарь, стройматериалы..." required></textarea>
+
+            <label for="photos">Фотографии приюта (2–3 фото)</label>
+            <input id="photos" type="file" accept="image/*" multiple>
+
+            <label>
+                <input type="checkbox" required>
+                Согласен на размещение данных на сайте
+            </label>
+
+            <button type="submit" class="button">Отправить заявку</button>
+
+        </div>
+    </form>
+
+    <p>
+        После отправки заявка рассматривается координатором
+        в течение 3 рабочих дней.
+    </p>
+    <p>
+        Сначала посмотрите <a href="shelter_rules.html">правила приюта</a>.
+    </p>
+</section>
+
+<footer>
+    <p>© 2026 «Добромобиль». Вместе помогаем животным!</p>
+</footer>
+
+</body>
+</html>
