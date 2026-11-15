@@ -146,3 +146,83 @@ class Enrollment(models.Model):
 
     def __str__(self):
         return f'{self.user.username} → {self.trip.title}'
+
+
+class ShelterApplication(models.Model):
+    """Заявка на регистрацию приюта с сайта."""
+    STATUS_NEW = 'new'
+    STATUS_APPROVED = 'approved'
+    STATUS_REJECTED = 'rejected'
+    STATUS_CHOICES = [
+        (STATUS_NEW, 'Новая'),
+        (STATUS_APPROVED, 'Одобрена'),
+        (STATUS_REJECTED, 'Отклонена'),
+    ]
+
+    name = models.CharField('Название приюта', max_length=200)
+    address = models.CharField('Адрес', max_length=300)
+    lat = models.FloatField('Широта', null=True, blank=True)
+    lng = models.FloatField('Долгота', null=True, blank=True)
+    contact_name = models.CharField('Контактное лицо', max_length=150)
+    contact_phone = models.CharField('Телефон', max_length=50)
+    contact_email = models.EmailField('Email')
+    description = models.TextField('Описание приюта', blank=True)
+    needs = models.TextField('Актуальные потребности', blank=True)
+    legal_info = models.TextField('Юридические данные (ИНН, ОГРН и т.д.)', blank=True)
+    status = models.CharField('Статус', max_length=20, choices=STATUS_CHOICES, default=STATUS_NEW)
+    created_at = models.DateTimeField('Создано', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Заявка приюта'
+        verbose_name_plural = 'Заявки приютов'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.name} ({self.get_status_display()})'
+
+
+class Review(models.Model):
+    """Отзыв волонтёра, приюта, перевозчика или жертвователя."""
+    ROLE_VOLUNTEER = 'volunteer'
+    ROLE_SHELTER = 'shelter'
+    ROLE_CARRIER = 'carrier'
+    ROLE_DONOR = 'donor'
+    ROLE_CHOICES = [
+        (ROLE_VOLUNTEER, 'Волонтёр'),
+        (ROLE_SHELTER, 'Приют'),
+        (ROLE_CARRIER, 'Перевозчик'),
+        (ROLE_DONOR, 'Жертвователь'),
+    ]
+
+    name = models.CharField('Имя', max_length=150)
+    role = models.CharField('Роль', max_length=20, choices=ROLE_CHOICES)
+    text = models.TextField('Текст отзыва')
+    rating = models.PositiveSmallIntegerField('Оценка (1–5)', default=5)
+    is_published = models.BooleanField('Опубликован', default=False)
+    created_at = models.DateTimeField('Создано', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.name} ({self.get_role_display()}) — {self.rating}'
+
+
+class ContactMessage(models.Model):
+    """Вопрос из FAQ / обратная связь."""
+    name = models.CharField('Имя', max_length=150)
+    email = models.EmailField('Email')
+    subject = models.CharField('Тема', max_length=200, blank=True)
+    message = models.TextField('Сообщение')
+    is_answered = models.BooleanField('Отвечено', default=False)
+    created_at = models.DateTimeField('Создано', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Сообщение'
+        verbose_name_plural = 'Сообщения'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.name}: {self.subject or "без темы"}'
