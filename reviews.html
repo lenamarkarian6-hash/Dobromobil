@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отзывы — Добромобиль</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h2>🐾 Добромобиль</h2>
+    <nav>
+        <a href="index.html">Главная</a>
+        <a href="about.html">О проекте</a>
+        <a href="guide.html">Как помочь</a>
+        <a href="map.html">Приюты</a>
+        <a href="shelter_register.html">Регистрация</a>
+        <a href="shelter_rules.html">Правила</a>
+        <a href="donations.html">Пожертвования</a>
+        <a href="faq.html">Вопросы</a>
+        <a href="reviews.html">Отзывы</a>
+        <a href="reports.html">Отчёты</a>
+        <a href="contacts.html">Контакты</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <h1>Отзывы волонтёров и приютов</h1>
+    <p>Истории людей, которые участвуют в помощи животным.</p>
+</section>
+
+<section>
+    <h2>Отзывы участников</h2>
+
+    <div class="card">
+        <h3>Анна — волонтёр ⭐⭐⭐⭐⭐</h3>
+        <p>«Первый раз поехала с «Добромобилем» в приют под Москвой. Координатор всё объяснил, работа нашлась для всех. Уехала с чувством, что сделала что-то важное. Через неделю записалась снова.»</p>
+        <p><strong>Роль:</strong> Волонтёр</p>
+    </div>
+
+    <div class="card">
+        <h3>Ирина — приют «Добрые руки» ⭐⭐⭐⭐⭐</h3>
+        <p>«Мы приют небольшой, и каждая машина с кормом — праздник. Через сайт заявку рассмотрели за два дня, рейс приехал через неделю. Спасибо, что не забываете про нас.»</p>
+        <p><strong>Роль:</strong> Представитель приюта</p>
+    </div>
+
+    <div class="card">
+        <h3>Сергей — партнёр-перевозчик ⭐⭐⭐⭐⭐</h3>
+        <p>«Я перевозчик. Удобно, что видно рейсы, где нужна машина. Взял рейс, отвёз корм, отметил выполнение — всё в личном кабинете.»</p>
+        <p><strong>Роль:</strong> Перевозчик</p>
+    </div>
+</section>
+
+<section>
+    <h2>Оставить свой отзыв</h2>
+    <p>Поделитесь впечатлениями об участии в проекте.</p>
+
+    <form onsubmit="event.preventDefault(); alert('Спасибо за отзыв! Это демонстрационная форма. Отзывы будут опубликованы после подключения отправки и модерации.');">
+
+        <div class="card">
+
+            <label for="name">Ваше имя</label>
+            <input id="name" type="text"
+                   placeholder="Введите имя" required>
+
+            <br><br>
+
+            <label for="role">Ваша роль</label>
+            <select id="role" required>
+                <option value="">Выберите роль</option>
+                <option value="volunteer">Волонтёр</option>
+                <option value="shelter">Представитель приюта</option>
+                <option value="driver">Перевозчик</option>
+                <option value="donor">Жертвователь</option>
+            </select>
+
+            <br><br>
+
+            <label for="review">Ваш отзыв</label>
+            <textarea id="review" rows="5"
+                      placeholder="Расскажите о своём опыте..."
+                      required></textarea>
+
+            <br><br>
+
+            <label for="rating">Ваша оценка</label>
+            <select id="rating" required>
+                <option value="">Выберите оценку</option>
+                <option value="5">5 — Отлично</option>
+                <option value="4">4 — Хорошо</option>
+                <option value="3">3 — Нормально</option>
+                <option value="2">2 — Плохо</option>
+                <option value="1">1 — Очень плохо</option>
+            </select>
+
+            <br><br>
+
+            <button type="submit" class="button">
+                Отправить отзыв
+            </button>
+
+        </div>
+    </form>
+</section>
+
+<section>
+    <h2>Модерация отзывов</h2>
+    <p>Все отзывы проходят модерацию перед публикацией. Мы публикуем честные отзывы — и положительные, и критические.</p>
+</section>
+
+<footer>
+    <p>© 2026 Добромобиль. Вместе помогаем животным!</p>
+</footer>
+
+</body>
+</html>
