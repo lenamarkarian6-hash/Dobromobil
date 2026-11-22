@@ -1,166 +1,235 @@
-{% extends 'core/base.html' %}
-{% block title %}Карта приютов — Добромобиль{% endblock %}
+{% extends 'core/base.html' %} 
+{% block title %}Карта приютов — Добромобиль{%endblock %} 
 {% block head %}
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-{% endblock %}
-{% block content %}
+<script
+  src="https://api-maps.yandex.ru/2.1/?apikey=acfb9d14-3485-4349-a96f-77268edc7438&lang=ru_RU"
+  type="text/javascript"
+></script>
+{% endblock %} {% block content %}
 
 <section class="hero">
-    <h1>Карта приютов</h1>
-    <p>Найди приют и узнай, кому нужна помощь.</p>
+  <h1>Карта приютов</h1>
+  <p>Найди приют и узнай, кому нужна помощь.</p>
 </section>
 
 <section>
-    <h2>Приюты и ближайшие рейсы</h2>
+  <h2>Приюты и ближайшие рейсы</h2>
 
-    <div class="card">
-        <label for="need">Что нужно приюту</label>
-        <select id="need">
-            <option value="all">Все потребности</option>
-            <option value="food">Корма</option>
-            <option value="medicine">Медикаменты</option>
-            <option value="things">Вещи и инвентарь</option>
-        </select>
+  <div class="card">
+    <label for="need">Что нужно приюту</label>
+    <select id="need">
+      <option value="all">Все потребности</option>
+      <option value="food">Корма</option>
+      <option value="medicine">Медикаменты</option>
+      <option value="things">Вещи и инвентарь</option>
+    </select>
 
-        <label for="date">Дата рейса</label>
-        <input type="date" id="date">
+    <label for="date">Дата рейса</label>
+    <input type="date" id="date" />
 
-        <label for="status">Статус рейса</label>
-        <select id="status">
-            <option value="all">Все приюты</option>
-            <option value="open">Набор волонтёров</option>
-            <option value="planned">Запланирован</option>
-            <option value="done">Выполнен</option>
-        </select>
+    <label for="status">Статус рейса</label>
+    <select id="status">
+      <option value="all">Все приюты</option>
+      <option value="open">Набор волонтёров</option>
+      <option value="planned">Запланирован</option>
+      <option value="done">Выполнен</option>
+    </select>
 
-        <button type="button" id="filterButton" class="button small">Применить фильтры</button>
-        <button type="button" id="nearbyButton" class="button small secondary">Показать приюты рядом</button>
-    </div>
+    <button type="button" id="filterButton" class="button small">
+      Применить фильтры
+    </button>
+    <button type="button" id="nearbyButton" class="button small secondary">
+      Показать приюты рядом
+    </button>
+  </div>
 
-    <div id="map" style="width: 100%; height: 450px; border-radius: 18px; margin-top: 20px;"></div>
+  <div
+    id="map"
+    style="width: 100%; height: 450px; border-radius: 18px; margin-top: 20px"
+  ></div>
 
-    <p id="mapMessage"></p>
+  <p id="mapMessage"></p>
 </section>
 
 <section>
-    <h2>Как пользоваться картой?</h2>
+  <h2>Как пользоваться картой?</h2>
 
-    <div class="card">
-        <h3>📍 Найди приют</h3>
-        <p>Посмотри расположение приютов на карте.</p>
-    </div>
+  <div class="card">
+    <h3>📍 Найди приют</h3>
+    <p>Посмотри расположение приютов на карте.</p>
+  </div>
 
-    <div class="card">
-        <h3>🐶 Узнай потребности</h3>
-        <p>Нажми на метку — увидишь, какие корма, медикаменты и вещи нужны.</p>
-    </div>
+  <div class="card">
+    <h3>🐶 Узнай потребности</h3>
+    <p>Нажми на метку — увидишь, какие корма, медикаменты и вещи нужны.</p>
+  </div>
 
-    <div class="card">
-        <h3>❤️ Помоги</h3>
-        <p>Запишись на рейс или <a href="/donations/">сделай пожертвование</a>.</p>
-    </div>
+  <div class="card">
+    <h3>❤️ Помоги</h3>
+    <p>Запишись на рейс или <a href="/donations/">сделай пожертвование</a>.</p>
+  </div>
 
-    <br>
-    <a href="/register/?role=organizer" class="button">Добавить свой приют</a>
+  <br />
+  <a href="/register/?role=organizer" class="button">Добавить свой приют</a>
 </section>
 
 {{ shelters_data|json_script:"shelters-data" }}
 {% endblock %}
-
 {% block scripts %}
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    var message = document.getElementById("mapMessage");
-    var shelters = JSON.parse(document.getElementById("shelters-data").textContent);
+  document.addEventListener('DOMContentLoaded', function () {
+    var message = document.getElementById('mapMessage');
+    var shelters = JSON.parse(
+      document.getElementById('shelters-data').textContent,
+    );
 
-    if (typeof L === "undefined") {
-        message.textContent = "Не удалось загрузить карту. Проверьте подключение к интернету.";
-        return;
+    if (typeof ymaps === 'undefined') {
+      message.textContent =
+        'Не удалось загрузить Яндекс.Карты. Проверьте подключение к интернету.';
+      return;
     }
 
-    // Центр по умолчанию — Сургут (адрес проекта)
-    var map = L.map("map").setView([61.254, 73.396], 11);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
+    ymaps.ready(function () {
+      var myMap = new ymaps.Map('map', {
+        center: [61.254, 73.396],
+        zoom: 11,
+        controls: ['zoomControl', 'fullscreenControl'],
+      });
 
-    var layer = L.layerGroup().addTo(map);
-    var needWords = {
+      var placemarkCollection = new ymaps.GeoObjectCollection();
+      myMap.geoObjects.add(placemarkCollection);
+
+      var needWords = {
         food: /корм|еда|питан/i,
         medicine: /медикамент|лекарств|ветерин|прививк/i,
-        things: /вещ|инвентар|одеял|переноск|будк|стройматериал/i
-    };
+        things: /вещ|инвентар|одеял|переноск|будк|стройматериал/i,
+      };
 
-    function esc(s) {
-        return String(s || "").replace(/[&<>"']/g, function (c) {
-            return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c];
+      function esc(s) {
+        return String(s || '').replace(/[&<>"']/g, function (c) {
+          return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+          }[c];
         });
-    }
+      }
 
-    function popup(s) {
-        var html = "<b>" + esc(s.name) + "</b><br>" + esc(s.address);
-        if (s.needs) html += "<br><em>Нужно: " + esc(s.needs) + "</em>";
-        var upcoming = s.trips.filter(function (t) { return t.upcoming; });
+      function popup(s) {
+        var html = '<b>' + esc(s.name) + '</b><br>' + esc(s.address);
+        if (s.needs) html += '<br><em>Нужно: ' + esc(s.needs) + '</em>';
+        var upcoming = s.trips.filter(function (t) {
+          return t.upcoming;
+        });
         if (upcoming.length) {
-            html += "<br><br><b>Рейсы:</b>";
-            upcoming.slice(0, 3).forEach(function (t) {
-                html += '<br><a href="' + t.url + '">' + esc(t.title) + "</a> — " +
-                        esc(t.date_display) + " (" + esc(t.status_display) + ")";
-            });
+          html += '<br><br><b>Рейсы:</b>';
+          upcoming.slice(0, 3).forEach(function (t) {
+            html +=
+              '<br><a href="' +
+              t.url +
+              '">' +
+              esc(t.title) +
+              '</a> — ' +
+              esc(t.date_display) +
+              ' (' +
+              esc(t.status_display) +
+              ')';
+          });
         }
         return html;
-    }
+      }
 
-    function render() {
-        var need = document.getElementById("need").value;
-        var date = document.getElementById("date").value;
-        var status = document.getElementById("status").value;
-        layer.clearLayers();
-        var bounds = [];
+      function render() {
+        var need = document.getElementById('need').value;
+        var date = document.getElementById('date').value;
+        var status = document.getElementById('status').value;
+        placemarkCollection.removeAll();
+        var count = 0;
 
         shelters.forEach(function (s) {
-            if (need !== "all" && !needWords[need].test(s.needs)) return;
-            if (date || status !== "all") {
-                var ok = s.trips.some(function (t) {
-                    return (!date || t.date === date) && (status === "all" || t.status === status);
-                });
-                if (!ok) return;
-            }
-            L.marker([s.lat, s.lng]).addTo(layer).bindPopup(popup(s));
-            bounds.push([s.lat, s.lng]);
+          if (need !== 'all' && !needWords[need].test(s.needs)) return;
+          if (date || status !== 'all') {
+            var ok = s.trips.some(function (t) {
+              return (
+                (!date || t.date === date) &&
+                (status === 'all' || t.status === status)
+              );
+            });
+            if (!ok) return;
+          }
+          var placemark = new ymaps.Placemark(
+            [s.lat, s.lng],
+            {
+              balloonContent: popup(s),
+            },
+            {
+              preset: 'islands#greenIcon',
+            },
+          );
+          placemarkCollection.add(placemark);
+          count++;
         });
 
-        if (bounds.length) {
-            map.fitBounds(bounds, {padding: [40, 40], maxZoom: 13});
-            message.textContent = "Найдено приютов: " + bounds.length + ".";
+        if (count > 0) {
+          myMap.setBounds(placemarkCollection.getBounds(), {
+            checkZoomRange: true,
+            zoomMargin: 40,
+          });
+          message.textContent = 'Найдено приютов: ' + count + '.';
         } else if (shelters.length) {
-            message.textContent = "По выбранным фильтрам приютов не найдено.";
+          message.textContent = 'По выбранным фильтрам приютов не найдено.';
         } else {
-            message.textContent = "Приюты появятся на карте после проверки заявок организаторов.";
+          message.textContent =
+            'Приюты появятся на карте после проверки заявок организаторов.';
         }
-    }
+      }
 
-    document.getElementById("filterButton").addEventListener("click", render);
-    render();
+      document.getElementById('filterButton').addEventListener('click', render);
+      render();
 
-    document.getElementById("nearbyButton").addEventListener("click", function () {
-        if (!navigator.geolocation) {
-            message.textContent = "Браузер не поддерживает определение местоположения.";
+      document
+        .getElementById('nearbyButton')
+        .addEventListener('click', function () {
+          if (!navigator.geolocation) {
+            message.textContent =
+              'Браузер не поддерживает определение местоположения.';
             return;
-        }
-        navigator.geolocation.getCurrentPosition(function (position) {
-            var here = L.latLng(position.coords.latitude, position.coords.longitude);
-            map.setView(here, 12);
-            L.marker(here).addTo(layer).bindPopup("Ваше примерное местоположение").openPopup();
-            var near = shelters.filter(function (s) { return here.distanceTo([s.lat, s.lng]) < 30000; });
-            message.textContent = near.length
-                ? "Приютов в радиусе 30 км: " + near.length + "."
-                : "В радиусе 30 км приютов пока нет.";
-        }, function () {
-            message.textContent = "Не удалось определить местоположение. Разрешите доступ в настройках браузера.";
+          }
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              var here = [position.coords.latitude, position.coords.longitude];
+              myMap.setCenter(here, 12);
+              var userMark = new ymaps.Placemark(
+                here,
+                {
+                  balloonContent: 'Ваше примерное местоположение',
+                },
+                {
+                  preset: 'islands#redDotIcon',
+                },
+              );
+              myMap.geoObjects.add(userMark);
+              userMark.balloon.open();
+              var near = shelters.filter(function (s) {
+                var dist = ymaps.coordSystem.geo.getDistance(here, [
+                  s.lat,
+                  s.lng,
+                ]);
+                return dist < 30000;
+              });
+              message.textContent = near.length
+                ? 'Приютов в радиусе 30 км: ' + near.length + '.'
+                : 'В радиусе 30 км приютов пока нет.';
+            },
+            function () {
+              message.textContent =
+                'Не удалось определить местоположение. Разрешите доступ в настройках браузера.';
+            },
+          );
         });
     });
-});
+  });
 </script>
 {% endblock %}
