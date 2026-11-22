@@ -1,0 +1,189 @@
+{% extends 'core/base.html' %}
+{% block title %}Пожертвования — Добромобиль{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <h1>Помоги животным!</h1>
+    <p>Каждый вклад помогает приютам получать необходимую поддержку.</p>
+    <a href="#donate" class="button">Сделать пожертвование</a>
+</section>
+
+<section>
+    <h2>На что пойдут пожертвования?</h2>
+
+    <div class="card">
+        <h3>🐾 Корма</h3>
+        <p>Покупка питания для животных в приютах.</p>
+    </div>
+
+    <div class="card">
+        <h3>💊 Медикаменты</h3>
+        <p>Приобретение необходимых лекарств и ветеринарных средств.</p>
+    </div>
+
+    <div class="card">
+        <h3>🚐 Транспорт</h3>
+        <p>Организация поездок и доставка помощи в приюты.</p>
+    </div>
+
+    <div class="card">
+        <h3>🧤 Инвентарь</h3>
+        <p>Покупка перчаток, переносок, уборочного инвентаря и других необходимых вещей.</p>
+    </div>
+</section>
+
+{% if campaigns %}
+<section>
+    <h2>Актуальные сборы</h2>
+    {% for c in campaigns %}
+        <div class="card">
+            <h3>{{ c.title }}</h3>
+            {% if c.shelter %}<p><strong>Приют:</strong> {{ c.shelter.name }}</p>{% endif %}
+            <p>{{ c.description|truncatechars:160 }}</p>
+            <div class="progress"><span style="width: {{ c.progress }}%"></span></div>
+            <p><strong>{{ c.collected }} ₽</strong> из {{ c.goal }} ₽{% if c.deadline %} · до {{ c.deadline|date:"d.m.Y" }}{% endif %}</p>
+            <a href="?campaign={{ c.id }}#donate" class="button small">Поддержать сбор</a>
+        </div>
+    {% endfor %}
+</section>
+{% endif %}
+
+<section id="donate">
+    <h2>Оформить пожертвование</h2>
+
+    <form method="post" action="/donations/#donate" id="donation-form">
+        {% csrf_token %}
+        <div class="card">
+            {{ form.non_field_errors }}
+
+            <h3>1. Сумма</h3>
+            <div class="amount-presets">
+                {% for value, text in presets %}
+                    <button type="button" data-amount="{{ value }}"><strong>{{ value }} ₽</strong><small>{{ text }}</small></button>
+                {% endfor %}
+            </div>
+            {% include 'core/_field.html' with field=form.amount %}
+
+            <h3>2. На что направить</h3>
+            {% include 'core/_field.html' with field=form.campaign %}
+            {% include 'core/_field.html' with field=form.purpose %}
+
+            <h3>3. Периодичность</h3>
+            {% include 'core/_field.html' with field=form.period %}
+
+            <h3>4. Ваши данные</h3>
+            {% include 'core/_field.html' with field=form.donor_name %}
+            {% include 'core/_field.html' with field=form.email %}
+            {% include 'core/_field.html' with field=form.comment %}
+            {% include 'core/_field.html' with field=form.is_anonymous %}
+
+            <h3>5. Способ оплаты</h3>
+            {% include 'core/_field.html' with field=form.payment_method %}
+
+            <div class="summary" id="summary">Укажите сумму пожертвования.</div>
+
+            {% include 'core/_field.html' with field=form.agree_offer %}
+
+            <button type="submit" class="button">Перейти к оплате</button>
+            <p class="hint" style="margin-top:15px;">
+                После нажатия вы получите номер пожертвования и инструкцию по оплате.
+                Мы не запрашиваем и не храним данные банковских карт.
+            </p>
+        </div>
+    </form>
+</section>
+
+<section>
+    <h2>Прозрачность и отчётность</h2>
+
+    <div class="card">
+        <h3>До 10% на административные расходы</h3>
+        <p>На административные расходы направляется не более 10% пожертвований.</p>
+    </div>
+
+    <div class="card">
+        <h3>Публикация отчётов</h3>
+        <p>Мы показываем информацию о собранных средствах и их использовании.</p>
+        <a href="/reviews/#reports" class="button small">Посмотреть отчёты</a>
+    </div>
+
+    <div class="card">
+        <h3>Подтверждение оплаты</h3>
+        <p>Каждое пожертвование получает номер. После поступления средств статус меняется на «Оплачено».</p>
+    </div>
+</section>
+
+<section id="requisites">
+    <h2>Реквизиты для пожертвований</h2>
+    <div class="card wide-card">
+        <p><strong>Получатель:</strong> {{ org.name }}</p>
+        <p><strong>ИНН / КПП:</strong> {{ org.inn }} / {{ org.kpp }}</p>
+        <p><strong>ОГРН:</strong> {{ org.ogrn }}</p>
+        <p><strong>Банк:</strong> {{ org.bank }}, БИК {{ org.bik }}</p>
+        <p><strong>Расчётный счёт:</strong> {{ org.account }}</p>
+        <p><strong>Корр. счёт:</strong> {{ org.corr_account }}</p>
+        <p><strong>Назначение платежа:</strong> «Добровольное пожертвование на уставную деятельность. НДС не облагается»</p>
+        <p>Вопросы по пожертвованиям: <a href="mailto:{{ org.email }}">{{ org.email }}</a></p>
+    </div>
+</section>
+
+<section id="offer">
+    <h2>Публичная оферта</h2>
+    <div class="card wide-card">
+        <p>Оформляя пожертвование, вы принимаете предложение {{ org.name }} заключить договор
+            добровольного пожертвования (ст. 582 ГК РФ). Пожертвование расходуется на уставные цели:
+            помощь приютам для животных — корма, медикаменты, транспорт и инвентарь.</p>
+        <p>Если вы ошиблись в сумме, напишите на <a href="mailto:{{ org.email }}">{{ org.email }}</a>,
+            указав номер пожертвования. Персональные данные обрабатываются в соответствии
+            с 152-ФЗ и используются только для подтверждения пожертвования и отчётности.</p>
+    </div>
+</section>
+
+<section>
+    <h2>Спасибо за вашу помощь! ❤️</h2>
+    <p>Даже небольшой вклад может сделать жизнь животных лучше.</p>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    var form = document.getElementById('donation-form');
+    var amount = form.querySelector('[name="amount"]');
+    var campaign = form.querySelector('[name="campaign"]');
+    var purpose = form.querySelector('[name="purpose"]');
+    var presets = form.querySelectorAll('.amount-presets button');
+    var summary = document.getElementById('summary');
+
+    function selectedText(select) {
+        return select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : '';
+    }
+
+    function update() {
+        presets.forEach(function (b) { b.classList.toggle('selected', b.dataset.amount === amount.value); });
+        purpose.disabled = !!campaign.value;   // у сбора своё направление
+        document.getElementById('wrap-purpose').style.opacity = campaign.value ? 0.5 : 1;
+
+        var value = parseInt(amount.value, 10);
+        if (!value || value < 10) {
+            summary.textContent = 'Укажите сумму пожертвования (от 10 ₽).';
+            return;
+        }
+        var period = form.querySelector('[name="period"]:checked');
+        var monthly = period && period.value === 'monthly';
+        var target = campaign.value ? 'сбор «' + selectedText(campaign) + '»' : selectedText(purpose).toLowerCase();
+        summary.innerHTML = 'Вы жертвуете <strong>' + value.toLocaleString('ru-RU') + ' ₽' +
+            (monthly ? ' ежемесячно' : '') + '</strong> — ' + target.replace(/[<>&]/g, '') + '.';
+    }
+
+    presets.forEach(function (b) {
+        b.addEventListener('click', function () { amount.value = b.dataset.amount; update(); });
+    });
+    form.addEventListener('input', update);
+    form.addEventListener('change', update);
+    form.addEventListener('submit', function () { purpose.disabled = false; });
+    update();
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% if field.is_hidden %}{{ field }}{% else %}
+<div class="field" id="wrap-{{ field.html_name }}">
+    {% if field.widget_type == 'checkbox' %}
+        <label class="inline">{{ field }} {{ field.label }}</label>
+    {% elif field.widget_type == 'radioselect' %}
+        <label>{{ field.label }}</label>
+        <div class="choice-list">{% for radio in field %}<label>{{ radio.tag }} {{ radio.choice_label }}</label>{% endfor %}</div>
+    {% else %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}<span class="req-mark">{% if field.field.required %} *{% endif %}</span></label>
+        {{ field }}
+    {% endif %}
+    {% if field.help_text %}<p class="hint">{{ field.help_text|safe }}</p>{% endif %}
+    {{ field.errors }}
+</div>
+{% endif %}

@@ -1,0 +1,105 @@
+{% extends 'core/base.html' %}
+{% block title %}Кабинет организатора — Добромобиль{% endblock %}
+{% block content %}
+{% include 'core/_cabinet_header.html' %}
+
+<section>
+    <h2>Заявки на добавление приюта</h2>
+    {% for app in applications %}
+        <div class="card">
+            <h3>🐾 {{ app.name }}</h3>
+            <p>{{ app.address }}</p>
+            <p><span class="badge {% if app.status == 'approved' %}ok{% elif app.status == 'new' %}wait{% else %}no{% endif %}">{{ app.get_status_display }}</span></p>
+            <p class="hint">Подана {{ app.created_at|date:"d.m.Y" }}</p>
+        </div>
+    {% empty %}
+        <p>Заявок нет. Чтобы добавить приют, напишите нам: <a href="mailto:{{ org.email }}">{{ org.email }}</a></p>
+    {% endfor %}
+    {% if applications and not shelters %}
+        <p>Заявка рассматривается координатором в течение 3 рабочих дней. После одобрения приют появится на карте,
+            а здесь откроется создание рейсов.</p>
+    {% endif %}
+</section>
+
+{% if shelters %}
+<section>
+    <h2>Мои приюты и потребности</h2>
+    {% for s in shelters %}
+        <form method="post" action="{% url 'cabinet' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="needs">
+            <input type="hidden" name="shelter_id" value="{{ s.id }}">
+            <div class="card">
+                <h3>{{ s.name }}</h3>
+                <p class="hint">{{ s.address }}</p>
+                <label for="needs-{{ s.id }}">Актуальные потребности</label>
+                <textarea id="needs-{{ s.id }}" name="needs" rows="3">{{ s.needs }}</textarea>
+                <button type="submit" class="button small">Обновить потребности</button>
+            </div>
+        </form>
+    {% endfor %}
+</section>
+
+<section id="new-trip">
+    <h2>Создать рейс</h2>
+    <form method="post" action="{% url 'cabinet' %}#new-trip">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="trip">
+        <div class="card">
+            {{ trip_form.non_field_errors }}
+            {% for field in trip_form %}{% include 'core/_field.html' %}{% endfor %}
+            <button type="submit" class="button">Создать рейс и открыть запись</button>
+        </div>
+    </form>
+</section>
+{% endif %}
+
+{% if trips %}
+<section>
+    <h2>Рейсы в мои приюты</h2>
+    {% for t in trips %}
+        <div class="card wide-card">
+            <h3>🚐 {{ t.title }} — {{ t.date|date:"d.m.Y H:i" }}</h3>
+            <p>{{ t.shelter.name }} · записано {{ t.seats_taken }} из {{ t.seats_total }}</p>
+            <form method="post" action="{% url 'cabinet' %}" class="inline-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="trip_status">
+                <input type="hidden" name="trip_id" value="{{ t.id }}">
+                <select name="status" aria-label="Статус рейса">
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}"{% if value == t.status %} selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="button small">Изменить статус</button>
+            </form>
+
+            {% if t.enrollments.all %}
+                <table class="data-table" style="margin-top:15px;">
+                    <tr><th>Участник</th><th>Телефон</th><th>Участие и часы</th></tr>
+                    {% for e in t.enrollments.all %}
+                        <tr>
+                            <td>{{ e.user.first_name|default:e.user.username }}</td>
+                            <td>{{ e.user.profile.phone|default:"—" }}</td>
+                            <td>
+                                <form method="post" action="{% url 'cabinet' %}" class="inline-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="attendance">
+                                    <input type="hidden" name="enrollment_id" value="{{ e.id }}">
+                                    <label class="inline" style="display:inline;"><input type="checkbox" name="is_attended"{% if e.is_attended %} checked{% endif %}> был</label>
+                                    <input type="number" name="hours" min="0" max="24" value="{{ e.hours }}" style="width:70px;" aria-label="Часы"> ч
+                                    <button type="submit" class="button small">OK</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="hint">Пока никто не записался.</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+</section>
+{% endif %}
+
+{% include 'core/_cabinet_footer.html' %}
+{% endblock %}

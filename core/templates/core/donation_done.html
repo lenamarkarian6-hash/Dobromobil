@@ -1,0 +1,63 @@
+{% extends 'core/base.html' %}
+{% block title %}Пожертвование {{ donation.number }} — Добромобиль{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <h1>Спасибо! Пожертвование оформлено</h1>
+    <p>Номер пожертвования: <strong>{{ donation.number }}</strong>. Осталось оплатить — инструкция ниже.</p>
+</section>
+
+<section>
+    <div class="card wide-card">
+        <h2>Ваше пожертвование</h2>
+        <table class="data-table">
+            <tr><td>Номер</td><td><strong>{{ donation.number }}</strong></td></tr>
+            <tr><td>Сумма</td><td><strong>{{ donation.amount }} ₽</strong> · {{ donation.get_period_display|lower }}</td></tr>
+            <tr><td>Назначение</td><td>{% if donation.campaign %}Сбор «{{ donation.campaign.title }}»{% else %}{{ donation.get_purpose_display }}{% endif %}</td></tr>
+            <tr><td>Способ оплаты</td><td>{{ donation.get_payment_method_display }}</td></tr>
+            <tr><td>Email</td><td>{{ donation.email }}</td></tr>
+            <tr><td>Статус</td><td>
+                <span class="badge {% if donation.status == 'paid' %}ok{% elif donation.status == 'pending' %}wait{% else %}no{% endif %}">
+                    {{ donation.get_status_display }}</span></td></tr>
+        </table>
+    </div>
+
+    {% if donation.status == 'pending' %}
+    <div class="card wide-card">
+        <h2>Как оплатить</h2>
+        {% if donation.payment_method == 'sbp' %}
+            <ol>
+                <li>Откройте приложение своего банка и выберите «Перевод по СБП» (по номеру телефона).</li>
+                <li>Номер получателя: <strong>{{ org.sbp_phone }}</strong>, получатель — <strong>{{ org.name }}</strong>.</li>
+                <li>Сумма: <strong>{{ donation.amount }} ₽</strong>.</li>
+                <li>В сообщении получателю укажите: <strong>Пожертвование {{ donation.number }}</strong>.</li>
+            </ol>
+        {% else %}
+            <p>Переведите пожертвование по реквизитам из приложения банка или с расчётного счёта:</p>
+            <table class="data-table">
+                <tr><td>Получатель</td><td>{{ org.name }}</td></tr>
+                <tr><td>ИНН / КПП</td><td>{{ org.inn }} / {{ org.kpp }}</td></tr>
+                <tr><td>Банк</td><td>{{ org.bank }}</td></tr>
+                <tr><td>БИК</td><td>{{ org.bik }}</td></tr>
+                <tr><td>Расчётный счёт</td><td>{{ org.account }}</td></tr>
+                <tr><td>Корр. счёт</td><td>{{ org.corr_account }}</td></tr>
+                <tr><td>Сумма</td><td>{{ donation.amount }} ₽</td></tr>
+                <tr><td>Назначение платежа</td><td><strong>Пожертвование {{ donation.number }} на уставную деятельность. НДС не облагается</strong></td></tr>
+            </table>
+        {% endif %}
+
+        {% if donation.period == 'monthly' %}
+            <p><strong>Ежемесячное пожертвование:</strong> настройте в приложении банка регулярный перевод
+                с тем же назначением платежа — так мы сможем учитывать его в отчётах.</p>
+        {% endif %}
+
+        <p>После поступления средств статус пожертвования изменится на «Оплачено».
+            Ссылку на эту страницу можно сохранить, чтобы проверить статус.</p>
+    </div>
+    {% endif %}
+
+    <a href="/donations/" class="button secondary">Сделать ещё одно пожертвование</a>
+    {% if user.is_authenticated %}<a href="{% url 'cabinet' %}" class="button">В личный кабинет</a>{% endif %}
+</section>
+
+{% endblock %}

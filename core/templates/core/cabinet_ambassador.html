@@ -1,0 +1,64 @@
+{% extends 'core/base.html' %}
+{% block title %}Кабинет амбассадора — Добромобиль{% endblock %}
+{% block content %}
+{% include 'core/_cabinet_header.html' %}
+
+<section>
+    <h2>Приглашайте новых участников</h2>
+    <div class="card wide-card">
+        <p>Поделитесь личной ссылкой — все, кто зарегистрируется по ней, появятся в вашем списке.</p>
+        <div class="copy-field">
+            <input type="text" id="ref-link" value="{{ ref_link }}" readonly>
+            <button type="button" class="button small" id="copy-ref">Копировать</button>
+        </div>
+        <p class="hint" style="margin-top:12px;">Ваш код приглашения: <strong>{{ profile.ref_code }}</strong></p>
+    </div>
+
+    <div class="card"><p class="stat-number">{{ invited|length }}</p><p>приглашено участников</p></div>
+    {% for row in invited_by_role %}
+        <div class="card"><p class="stat-number">{{ row.n }}</p><p>{% if row.role == 'volunteer' %}волонтёров{% elif row.role == 'organizer' %}организаторов{% elif row.role == 'fundraiser' %}фандрайзеров{% else %}амбассадоров{% endif %}</p></div>
+    {% endfor %}
+    <div class="card"><p class="stat-number">{{ invited_hours }}</p><p>часов помощи от приглашённых</p></div>
+</section>
+
+<section>
+    <h2>Приглашённые участники</h2>
+    {% if invited %}
+        <div class="card wide-card">
+            <table class="data-table">
+                <tr><th>Имя</th><th>Роль</th><th>Город</th><th>Дата регистрации</th></tr>
+                {% for p in invited %}
+                    <tr><td>{{ p.user.first_name|default:p.user.username }}</td><td>{{ p.get_role_display }}</td>
+                        <td>{{ p.city|default:"—" }}</td><td>{{ p.created_at|date:"d.m.Y" }}</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% else %}
+        <p>По вашей ссылке пока никто не зарегистрировался.</p>
+    {% endif %}
+</section>
+
+<section>
+    <h2>Материалы для рассказа о проекте</h2>
+    <div class="card wide-card">
+        <p>«Добромобиль» — волонтёрский проект помощи приютам для животных. Мы организуем рейсы,
+            собираем корма и медикаменты и публикуем отчёты о каждом сборе. Присоединяйся: {{ ref_link }}</p>
+        <a href="/reviews/#reports" class="button small secondary">Свежие отчёты для публикаций</a>
+    </div>
+</section>
+
+{% include 'core/_cabinet_trips.html' %}
+{% include 'core/_cabinet_footer.html' %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('copy-ref').addEventListener('click', function () {
+    var input = document.getElementById('ref-link');
+    input.select();
+    (navigator.clipboard ? navigator.clipboard.writeText(input.value) : Promise.reject())
+        .catch(function () { document.execCommand('copy'); });
+    this.textContent = 'Скопировано!';
+});
+</script>
+{% endblock %}

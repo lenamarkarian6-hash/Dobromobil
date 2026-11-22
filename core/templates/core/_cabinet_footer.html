@@ -1,0 +1,32 @@
+{% if my_donations %}
+<section>
+    <h2>Мои пожертвования</h2>
+    <div class="card wide-card">
+        <table class="data-table">
+            <tr><th>Номер</th><th>Дата</th><th>Сумма</th><th>Назначение</th><th>Статус</th></tr>
+            {% for d in my_donations %}
+                <tr>
+                    <td><a href="{% url 'donation_done' d.token %}">{{ d.number }}</a></td>
+                    <td>{{ d.created_at|date:"d.m.Y" }}</td>
+                    <td>{{ d.amount }} ₽</td>
+                    <td>{% if d.campaign %}{{ d.campaign.title }}{% else %}{{ d.get_purpose_display }}{% endif %}</td>
+                    <td><span class="badge {% if d.status == 'paid' %}ok{% elif d.status == 'pending' %}wait{% else %}no{% endif %}">{{ d.get_status_display }}</span></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% endif %}
+
+<section id="profile">
+    <h2>Мой профиль</h2>
+    <form method="post" action="{% url 'cabinet' %}#profile">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="profile">
+        <div class="card">
+            <p><strong>Логин:</strong> {{ user.username }} · <strong>Email:</strong> {{ user.email }}</p>
+            {% for field in profile_form %}{% include 'core/_field.html' %}{% endfor %}
+            <button type="submit" class="button">Сохранить</button>
+        </div>
+    </form>
+</section>

@@ -1,0 +1,57 @@
+<section>
+    <div class="card"><p class="stat-number">{{ total_hours }}</p><p>волонтёрских часов</p></div>
+    <div class="card"><p class="stat-number">{{ trips_done }}</p><p>рейсов выполнено</p></div>
+    <div class="card"><p class="stat-number">{{ upcoming_enrollments|length }}</p><p>предстоящих рейсов</p></div>
+</section>
+
+<section>
+    <h2>Мои предстоящие рейсы</h2>
+    {% for e in upcoming_enrollments %}
+        <div class="card">
+            <h3>🚐 {{ e.trip.title }}</h3>
+            <p>{{ e.trip.date|date:"d.m.Y H:i" }}<br>{{ e.trip.shelter.name }}<br>{{ e.trip.get_status_display }}</p>
+            <a href="{% url 'trip_detail' e.trip.id %}" class="button small">Подробнее</a>
+            <form method="post" action="{% url 'cancel_enrollment' e.trip.id %}" class="inline-form">
+                {% csrf_token %}
+                <button type="submit" class="button small secondary">Отменить</button>
+            </form>
+        </div>
+    {% empty %}
+        <p>Вы пока не записаны ни на один рейс.</p>
+    {% endfor %}
+</section>
+
+<section>
+    <h2>Можно записаться</h2>
+    {% for t in available_trips %}
+        <div class="card">
+            <h3>{{ t.title }}</h3>
+            <p>{{ t.date|date:"d.m.Y H:i" }}<br>{{ t.shelter.name }}<br>Свободно мест: {{ t.seats_left }}</p>
+            <form method="post" action="{% url 'enroll' t.id %}" class="inline-form">
+                {% csrf_token %}
+                <button type="submit" class="button small">Записаться</button>
+            </form>
+        </div>
+    {% empty %}
+        <p>Открытых рейсов сейчас нет — загляните на <a href="/map/">карту приютов</a> позже.</p>
+    {% endfor %}
+</section>
+
+{% if past_enrollments %}
+<section>
+    <h2>История рейсов</h2>
+    <div class="card wide-card">
+        <table class="data-table">
+            <tr><th>Рейс</th><th>Дата</th><th>Приют</th><th>Участие</th><th>Часы</th></tr>
+            {% for e in past_enrollments %}
+                <tr>
+                    <td>{{ e.trip.title }}</td><td>{{ e.trip.date|date:"d.m.Y" }}</td><td>{{ e.trip.shelter.name }}</td>
+                    <td>{% if e.is_attended %}<span class="badge ok">Подтверждено</span>{% else %}<span class="badge wait">Ожидает отметки</span>{% endif %}</td>
+                    <td>{{ e.hours }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <a href="/reviews/#leave-review" class="button">Оставить отзыв о рейсе</a>
+</section>
+{% endif %}

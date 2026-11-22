@@ -1,0 +1,74 @@
+{% extends 'core/base.html' %}
+{% block title %}Кабинет фандрайзера — Добромобиль{% endblock %}
+{% block content %}
+{% include 'core/_cabinet_header.html' %}
+
+<section>
+    <div class="card"><p class="stat-number">{{ campaigns|length }}</p><p>сборов</p></div>
+    <div class="card"><p class="stat-number">{{ total_collected }} ₽</p><p>собрано (оплачено)</p></div>
+</section>
+
+<section>
+    <h2>Мои сборы</h2>
+    {% for c in campaigns %}
+        <div class="card wide-card">
+            <h3>{{ c.title }}</h3>
+            <p>
+                {% if not c.is_approved %}<span class="badge wait">На проверке модератором</span>
+                {% elif c.is_active %}<span class="badge ok">Идёт сбор</span>
+                {% else %}<span class="badge">Завершён</span>{% endif %}
+                · {{ c.get_purpose_display }}{% if c.shelter %} · {{ c.shelter.name }}{% endif %}
+                {% if c.deadline %} · до {{ c.deadline|date:"d.m.Y" }}{% endif %}
+            </p>
+            <div class="progress"><span style="width: {{ c.progress }}%"></span></div>
+            <p><strong>{{ c.collected_sum|default:0 }} ₽</strong> из {{ c.goal }} ₽ · пожертвований: {{ c.donors }}</p>
+            {% if c.is_approved and c.is_active %}
+                <label for="link-{{ c.id }}">Ссылка на сбор</label>
+                <input id="link-{{ c.id }}" type="text" readonly value="{{ campaign_base_url }}{{ c.id }}#donate" onclick="this.select()">
+                <form method="post" action="{% url 'cabinet' %}" class="inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="campaign_close">
+                    <input type="hidden" name="campaign_id" value="{{ c.id }}">
+                    <button type="submit" class="button small secondary">Завершить сбор</button>
+                </form>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p>У вас пока нет сборов — создайте первый.</p>
+    {% endfor %}
+</section>
+
+<section id="new-campaign">
+    <h2>Создать сбор</h2>
+    <form method="post" action="{% url 'cabinet' %}#new-campaign">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="campaign">
+        <div class="card">
+            {% for field in campaign_form %}{% include 'core/_field.html' %}{% endfor %}
+            <p class="hint">Сбор появится на вкладке «Пожертвования» после проверки модератором.</p>
+            <button type="submit" class="button">Отправить на проверку</button>
+        </div>
+    </form>
+</section>
+
+{% if campaign_donations %}
+<section>
+    <h2>Пожертвования в мои сборы</h2>
+    <div class="card wide-card">
+        <table class="data-table">
+            <tr><th>Номер</th><th>Дата</th><th>Сбор</th><th>Жертвователь</th><th>Сумма</th><th>Статус</th></tr>
+            {% for d in campaign_donations %}
+                <tr>
+                    <td>{{ d.number }}</td><td>{{ d.created_at|date:"d.m.Y" }}</td><td>{{ d.campaign.title }}</td>
+                    <td>{% if d.is_anonymous %}Аноним{% else %}{{ d.donor_name|default:"—" }}{% endif %}</td>
+                    <td>{{ d.amount }} ₽</td>
+                    <td><span class="badge {% if d.status == 'paid' %}ok{% elif d.status == 'pending' %}wait{% else %}no{% endif %}">{{ d.get_status_display }}</span></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% endif %}
+
+{% include 'core/_cabinet_footer.html' %}
+{% endblock %}

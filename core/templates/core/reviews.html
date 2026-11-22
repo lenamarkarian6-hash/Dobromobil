@@ -1,0 +1,148 @@
+{% extends 'core/base.html' %}
+{% block title %}Отзывы и отчёты — Добромобиль{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <h1>Отзывы и отчёты</h1>
+    <p>Истории участников проекта и цифры о том, что мы сделали и куда направили помощь.</p>
+    <a href="#leave-review" class="button">Оставить отзыв</a>
+    <a href="#reports" class="button secondary">Смотреть отчёты</a>
+</section>
+
+<section>
+    <h2>Отзывы участников</h2>
+
+    {% for r in reviews %}
+        <div class="card">
+            {% if r.photo %}<img src="{{ r.photo.url }}" alt="Фото к отзыву {{ r.name }}" class="review-photo" loading="lazy">{% endif %}
+            <h3>{{ r.name }} {{ r.stars }}</h3>
+            <p>«{{ r.text|linebreaksbr }}»</p>
+            <p><strong>Роль:</strong> {{ r.get_role_display }}</p>
+        </div>
+    {% empty %}
+        <p>Отзывов пока нет — станьте первым!</p>
+    {% endfor %}
+</section>
+
+{% if photos %}
+<section>
+    <h2>Фото с рейсов</h2>
+    <div class="gallery">
+        {% for r in photos %}
+            <a href="{{ r.photo.url }}" target="_blank" rel="noopener"><img src="{{ r.photo.url }}" alt="Фото от {{ r.name }}" loading="lazy"></a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section id="leave-review">
+    <h2>Оставить свой отзыв</h2>
+    <p>Поделитесь впечатлениями об участии в проекте и прикрепите фото с рейса.</p>
+
+    <form method="post" action="/reviews/#leave-review" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="card">
+            {% include 'core/_field.html' with field=form.name %}
+            {% include 'core/_field.html' with field=form.role %}
+            {% include 'core/_field.html' with field=form.rating %}
+            {% include 'core/_field.html' with field=form.text %}
+            {% include 'core/_field.html' with field=form.photo %}
+            <p class="hint">JPG, PNG или WEBP, до 5 МБ. Фотографируйте животных и людей только с их разрешения и разрешения приюта.</p>
+            <div class="photo-preview" id="photo-preview"></div>
+            <button type="submit" class="button">Отправить отзыв</button>
+        </div>
+    </form>
+
+    <p>Все отзывы проходят модерацию перед публикацией. Мы публикуем честные отзывы — и положительные, и критические.</p>
+</section>
+
+<section id="reports">
+    <h2>Отчётность проекта</h2>
+
+    {% if latest_report %}
+        <h3>Результаты: {{ latest_report.period }}</h3>
+
+        <div class="card">
+            <h3>🚐 {{ latest_report.trips }} рейсов</h3>
+            <p>Организовано поездок в приюты.</p>
+        </div>
+        <div class="card">
+            <h3>🐾 {{ latest_report.shelters }} приютов</h3>
+            <p>Получили помощь от проекта.</p>
+        </div>
+        <div class="card">
+            <h3>❤️ {{ latest_report.volunteers }} волонтёров</h3>
+            <p>Приняли участие в рейсах.</p>
+        </div>
+        <div class="card">
+            <h3>💰 {{ latest_report.collected }} ₽</h3>
+            <p>Собрано пожертвований.</p>
+        </div>
+        <div class="card">
+            <h3>📦 {{ latest_report.spent }} ₽</h3>
+            <p>Потрачено на помощь.</p>
+        </div>
+
+        <div class="card wide-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Период</th><th>Рейсов</th><th>Приютов</th><th>Волонтёров</th>
+                        <th>Собрано</th><th>Потрачено</th><th>Остаток</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rep in reports %}
+                        <tr>
+                            <td>{{ rep.period }}</td><td>{{ rep.trips }}</td><td>{{ rep.shelters }}</td>
+                            <td>{{ rep.volunteers }}</td><td>{{ rep.collected }} ₽</td><td>{{ rep.spent }} ₽</td>
+                            <td>{{ rep.balance }} ₽</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>Отчёты появятся после завершения первого периода.</p>
+    {% endif %}
+
+    <div class="card wide-card">
+        <h3>Что мы публикуем?</h3>
+        <p>✓ Количество проведённых рейсов.</p>
+        <p>✓ Количество приютов, получивших помощь.</p>
+        <p>✓ Количество участвовавших волонтёров.</p>
+        <p>✓ Суммы собранных и потраченных средств.</p>
+        <p>✓ Фотографии с рейсов (с разрешения приютов).</p>
+    </div>
+
+    <h3>Нужен подробный отчёт?</h3>
+    <p>Если вам необходим отчёт за конкретный период или для юридического лица, напишите нам:
+        <a href="mailto:{{ org.email }}">{{ org.email }}</a></p>
+    <a href="/about/#write-us" class="button">Связаться с нами</a>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    var input = document.querySelector('input[name="photo"]');
+    var preview = document.getElementById('photo-preview');
+    if (!input) return;
+    input.addEventListener('change', function () {
+        preview.innerHTML = '';
+        var file = input.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Файл слишком большой: максимум 5 МБ.');
+            input.value = '';
+            return;
+        }
+        var img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.alt = 'Предпросмотр фото';
+        preview.appendChild(img);
+    });
+})();
+</script>
+{% endblock %}

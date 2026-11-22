@@ -1,18 +1,20 @@
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import Group
+
+from core.models import Profile
+
+OLD_ROLES = ['Жертвователь', 'Координатор']
 
 
 class Command(BaseCommand):
-    help = 'Создаёт базовые роли: Волонтёр, Жертвователь, Координатор'
+    help = 'Создаёт 4 роли сайта: Амбассадор, Организатор, Фандрайзер, Волонтёр'
 
     def handle(self, *args, **options):
-        for role in ['Волонтёр', 'Жертвователь', 'Координатор']:
-            group, created = Group.objects.get_or_create(name=role)
-            if created:
-                self.stdout.write(self.style.SUCCESS('Создана роль: ' + role))
-            else:
-                self.stdout.write('Роль уже есть: ' + role)
+        for _, role in Profile.ROLE_CHOICES:
+            _, created = Group.objects.get_or_create(name=role)
+            self.stdout.write(self.style.SUCCESS(f'Создана роль: {role}') if created else f'Роль уже есть: {role}')
 
-        coord = Group.objects.get(name='Координатор')
-        coord.permissions.set(Permission.objects.all())
-        self.stdout.write(self.style.SUCCESS('Координатор получил все права'))
+        removed, _ = Group.objects.filter(name__in=OLD_ROLES).delete()
+        if removed:
+            self.stdout.write(f'Удалены старые роли: {", ".join(OLD_ROLES)}')
+        self.stdout.write('Управление сайтом выполняет администратор (createsuperuser) через /admin/.')

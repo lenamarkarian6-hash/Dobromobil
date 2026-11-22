@@ -1,12 +1,180 @@
 {% extends 'core/base.html' %}
+{% block title %}Регистрация и вход — Добромобиль{% endblock %}
 {% block content %}
-<h1>Регистрация</h1>
-<div class="card">
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn">Зарегистрироваться</button>
-    </form>
-    <p style="margin-top:1rem;">Уже есть аккаунт? <a href="/login/">Войти</a></p>
-</div>
+
+<section class="hero">
+    <h1>Регистрация и вход в личный кабинет</h1>
+    <p>Выберите роль в проекте — у каждой роли свой личный кабинет.</p>
+</section>
+
+{% if already %}
+<section>
+    <div class="card wide-card" style="text-align:center;">
+        <h2>Вы уже вошли</h2>
+        <p>Вы вошли как <strong>{{ user.first_name|default:user.username }}</strong>
+            {% if user.profile %}({{ user.profile.get_role_display }}){% endif %}.</p>
+        <a href="{% url 'cabinet' %}" class="button">Перейти в личный кабинет</a>
+        <form method="post" action="{% url 'logout' %}" class="inline-form">
+            {% csrf_token %}
+            <button type="submit" class="button secondary">Выйти</button>
+        </form>
+    </div>
+</section>
+{% else %}
+
+<section>
+    <div class="tabs" role="tablist">
+        <button type="button" data-tab="register" class="{% if active_tab != 'login' %}active{% endif %}">Регистрация</button>
+        <button type="button" data-tab="login" class="{% if active_tab == 'login' %}active{% endif %}">Вход в личный кабинет</button>
+    </div>
+
+    {# ---------- ВХОД ---------- #}
+    <div class="tab-panel" id="panel-login" {% if active_tab != 'login' %}hidden{% endif %}>
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="card">
+                <h3>Вход для амбассадоров, организаторов, фандрайзеров и волонтёров</h3>
+                {{ login_form.non_field_errors }}
+                {% for field in login_form %}{% include 'core/_field.html' %}{% endfor %}
+                <input type="hidden" name="next" value="{{ next|default:'/cabinet/' }}">
+                <button type="submit" class="button">Войти</button>
+                <p class="hint" style="margin-top:15px;">Личный кабинет откроется автоматически в соответствии с вашей ролью.</p>
+            </div>
+        </form>
+    </div>
+
+    {# ---------- РЕГИСТРАЦИЯ ---------- #}
+    <div class="tab-panel" id="panel-register" {% if active_tab == 'login' %}hidden{% endif %}>
+        <form method="post" action="{% url 'register' %}" enctype="multipart/form-data" id="register-form">
+            {% csrf_token %}
+            {{ form.ref }}
+            <div class="card">
+                {{ form.non_field_errors }}
+
+                <label>Кем вы хотите быть в проекте *</label>
+                <div class="role-picker">
+                    {% for radio in form.role %}
+                        <label>
+                            {{ radio.tag }}
+                            <span class="role-icon">{% cycle '📣' '🐾' '💰' '🙋' %}</span>
+                            {{ radio.choice_label }}
+                        </label>
+                    {% endfor %}
+                </div>
+                {{ form.role.errors }}
+                <p class="hint" id="role-hint"></p>
+
+                <fieldset>
+                    <legend>Данные для входа</legend>
+                    {% include 'core/_field.html' with field=form.username %}
+                    {% include 'core/_field.html' with field=form.password1 %}
+                    {% include 'core/_field.html' with field=form.password2 %}
+                </fieldset>
+
+                <fieldset>
+                    <legend>Контакты</legend>
+                    {% include 'core/_field.html' with field=form.first_name %}
+                    {% include 'core/_field.html' with field=form.email %}
+                    {% include 'core/_field.html' with field=form.phone %}
+                    {% include 'core/_field.html' with field=form.city %}
+                    {% include 'core/_field.html' with field=form.about %}
+                </fieldset>
+
+                <fieldset id="shelter-block">
+                    <legend>Данные приюта (для организатора)</legend>
+                    <p class="hint">Заявка уйдёт координатору — после проверки приют появится на карте.</p>
+                    {% include 'core/_field.html' with field=form.shelter_name %}
+                    {% include 'core/_field.html' with field=form.shelter_address %}
+                    {% include 'core/_field.html' with field=form.shelter_lat %}
+                    {% include 'core/_field.html' with field=form.shelter_lng %}
+                    {% include 'core/_field.html' with field=form.position %}
+                    {% include 'core/_field.html' with field=form.shelter_description %}
+                    {% include 'core/_field.html' with field=form.shelter_needs %}
+                    <h4>Юридические данные (при наличии)</h4>
+                    {% include 'core/_field.html' with field=form.inn %}
+                    {% include 'core/_field.html' with field=form.ogrn %}
+                    {% include 'core/_field.html' with field=form.legal_status %}
+                    {% include 'core/_field.html' with field=form.shelter_photos %}
+                </fieldset>
+
+                {% include 'core/_field.html' with field=form.agree %}
+
+                <button type="submit" class="button">Зарегистрироваться</button>
+                <p class="hint" style="margin-top:15px;">
+                    Перед первым рейсом прочитайте <a href="/rules/">правила посещения приютов</a>.
+                </p>
+            </div>
+        </form>
+    </div>
+</section>
+{% endif %}
+
+<section>
+    <h2>Что есть в личном кабинете</h2>
+
+    <div class="card">
+        <h3>📣 Амбассадор</h3>
+        <p>Личная ссылка-приглашение, список приглашённых участников, запись на рейсы.</p>
+    </div>
+    <div class="card">
+        <h3>🐾 Организатор</h3>
+        <p>Статус заявки приюта, потребности, создание рейсов, отметка участников и часов.</p>
+    </div>
+    <div class="card">
+        <h3>💰 Фандрайзер</h3>
+        <p>Создание сборов, прогресс по каждому сбору, список поступивших пожертвований.</p>
+    </div>
+    <div class="card">
+        <h3>🙋 Волонтёр</h3>
+        <p>Запись на рейсы и отмена записи, история поездок, учёт волонтёрских часов.</p>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    // Переключение вкладок «Регистрация / Вход»
+    document.querySelectorAll('.tabs button').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.tabs button').forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            document.querySelectorAll('.tab-panel').forEach(function (p) {
+                p.hidden = p.id !== 'panel-' + btn.dataset.tab;
+            });
+        });
+    });
+
+    var form = document.getElementById('register-form');
+    if (!form) return;
+
+    // Описание приюта и потребности обязательны только для организатора
+    var hints = {
+        ambassador: 'Амбассадор рассказывает о проекте и приглашает участников по личной ссылке.',
+        organizer: 'Организатор представляет приют: заполните данные приюта — поля со звёздочкой обязательны.',
+        fundraiser: 'Фандрайзер запускает сборы средств на нужды приютов.',
+        volunteer: 'Волонтёр записывается на рейсы и помогает в приютах.'
+    };
+    var organizerRequired = ['shelter_name', 'shelter_address', 'shelter_description', 'shelter_needs'];
+    var block = document.getElementById('shelter-block');
+
+    function update() {
+        var checked = form.querySelector('input[name="role"]:checked');
+        var role = checked ? checked.value : 'volunteer';
+        var isOrganizer = role === 'organizer';
+        block.hidden = !isOrganizer;
+        document.getElementById('role-hint').textContent = hints[role] || '';
+        organizerRequired.forEach(function (name) {
+            var input = form.querySelector('[name="' + name + '"]');
+            var mark = document.querySelector('#wrap-' + name + ' .req-mark');
+            if (input) input.required = isOrganizer;
+            if (mark) mark.textContent = isOrganizer ? ' *' : '';
+        });
+    }
+
+    form.querySelectorAll('input[name="role"]').forEach(function (r) { r.addEventListener('change', update); });
+    update();
+})();
+</script>
 {% endblock %}

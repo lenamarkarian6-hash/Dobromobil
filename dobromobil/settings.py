@@ -39,6 +39,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.site',
             ],
         },
     },
@@ -68,8 +69,32 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
+# Загруженные пользователями файлы (фото в отзывах и заявках приютов)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
+
+# Реквизиты организации: показываются в подвале и на странице оплаты пожертвования.
+# Замените значения на подтверждённые данные организации.
+ORGANIZATION = {
+    'name': 'АНО «Добромобиль»',
+    'inn': '0000000000',
+    'kpp': '000000000',
+    'ogrn': '0000000000000',
+    'bank': 'ПАО «Банк»',
+    'account': '00000000000000000000',
+    'corr_account': '00000000000000000000',
+    'bik': '000000000',
+    'sbp_phone': '+7 (911) 475-62-42',
+    'email': 'info@dobromobil.ru',
+    'phone': '+7 (911) 475-62-42',
+    'phone_href': '+79114756242',
+    'address': 'Сургут, Югорский тракт, 38',
+}
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/cabinet/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
